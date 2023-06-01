@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.biuqu.boot.dao.global.ConfigBizDao">
+    <select id="getBatch" resultType="GlobalConfig">
+        SELECT id, client_id, url_id, svc_id, svc_value
+        FROM bq_global_config
+        WHERE (client_id = #{model.clientId} AND url_id = #{model.urlId} AND svc_id = #{model.svcId})
+           OR (client_id = #{model.clientId} AND url_id is null AND svc_id = #{model.svcId})
+           OR (client_id is null AND url_id = #{model.urlId} AND svc_id = #{model.svcId})
+           OR (client_id is null AND url_id is null AND svc_id = #{model.svcId})
+    </select>
+    <select id="batchGet" resultType="GlobalConfig">
+        SELECT id, client_id, url_id, svc_id, svc_value
+        FROM bq_global_config
+        WHERE
+        <foreach collection="batch" item="model" open="" close="" separator=" OR ">
+            (client_id = #{model.clientId} AND url_id = #{model.urlId} AND svc_id = #{model.svcId})
+            OR (client_id = #{model.clientId} AND url_id is null AND svc_id = #{model.svcId})
+            OR (client_id is null AND url_id = #{model.urlId} AND svc_id = #{model.svcId})
+            OR (client_id is null AND url_id is null AND svc_id = #{model.svcId})
+        </foreach>
+    </select>
+</mapper>

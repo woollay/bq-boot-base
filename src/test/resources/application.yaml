@@ -1,0 +1,129 @@
+logging:
+  level:
+    ROOT: INFO
+#  config: classpath:log4j2.xml
+server:
+  port: 8080
+  servlet:
+    context-path: /
+  tomcat:
+    uri-encoding: UTF-8
+    max-connections: 2000
+    max-threads: 2000
+    basedir: /opt/logs/${spring.application.name}/
+    accesslog:
+      directory: /opt/logs/${spring.application.name}/access
+      enable: true
+      buffered: false
+      prefix: access_log
+      suffix: .log
+      pattern: '%{yy-MM-dd HH:mm:ss.SSS}t|%a|%h|%H|%r|%s|%b|%Dms|forward:%{X-Forwarded-For}i|refer:%{Referer}i|'
+spring:
+  application:
+    name: demo
+  banner:
+    charset: UTF-8
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+  messages:
+    encoding: UTF-8
+  thymeleaf:
+    cache: false
+
+  #redis后续改成集群模式
+  redis:
+    database: 0
+    host: localhost
+    port: 6379
+    password: ''
+    #连接超时时间(ms)
+    timeout: 3000
+    lettuce:
+      pool:
+        max-active: 20
+        max-wait: -1
+        max-idle: 8
+        min-idle: 2
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    initialSize: 5
+    maxActive: 20
+    poolPreparedStatements: true
+    maxPoolPreparedStatementPerConnectionSize: 20
+    maxWait: 60000
+    minEvictableIdleTimeMillis: 300000
+    minIdle: 5
+    #自动回收超时的连接
+    removeAbandoned: true
+    #回收的超时时间(单位:s)
+    removeAbandonedTimeout: 180
+    #回收时打印连接的异常信息
+    logAbandoned: true
+    testOnBorrow: false
+    testOnReturn: false
+    testWhileIdle: true
+    #连接在连接池中的最小生存时间
+    minEvictableIdleTimeMills: 60000
+    timeBetweenEvictionRunsMillis: 60000
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:postgresql://localhost:5432/postgres?&schema=public&useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true
+    username: postgres
+    password: ENC(b49eb8bff212b6e037628e9699c5d3f9)
+    #password: postgres
+    validationQuery: SELECT 'test' as txt
+
+mybatis:
+  config-location: classpath:global-config/mybatis.xml
+  mapper-locations: classpath*:mapper/*/*.xml
+  type-aliases-package: com.biuqu.model,com.biuqu.boot.model,com.biuqu.boot.*.model,com.biuqu.boot.*.*.model
+
+#服务健康检查
+management:
+  health:
+    redis:
+      enable: false
+    db:
+      enable: false
+    diskSpace:
+      enable: false
+  endpoints:
+    web:
+      base-path: /${spring.application.name}/status
+      exposure:
+        include: health,info,loggers
+    health:
+      #关闭过滤敏感信息
+      sensitive: false
+  endpoint:
+    health:
+      show-details: ALWAYS
+
+biuqu:
+  schedule:
+    tasks:
+      - id: cache-refresh-task
+        cron: '0 */2 * * * ?'
+        single: true
+        releaseDelay: -1
+        #最大存活时间(s)
+        maxTime: 3600
+  channel:
+    jwt:
+      serviceId: xxx
+      pubKey: xxx
+      priKey: xxx
+      url: xxx
+      #token过期时间(s)
+      connTimeout: 1800
+      #刷新token的过期时间(s)
+      timeout: 3600
+
+
+
+
+
+
