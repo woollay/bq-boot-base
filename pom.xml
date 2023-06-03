@@ -8,7 +8,7 @@
     <parent>
         <groupId>com.biuqu</groupId>
         <artifactId>bq-parent</artifactId>
-        <version>1.0.2</version>
+        <version>1.0.3</version>
     </parent>
 
     <artifactId>bq-boot-base</artifactId>
@@ -26,7 +26,7 @@
         <dependency>
             <groupId>com.biuqu</groupId>
             <artifactId>bq-boot-root</artifactId>
-            <version>${project.version}</version>
+            <version>${bq.version}</version>
         </dependency>
 
         <dependency>
@@ -63,6 +63,22 @@
         </dependency>
     </dependencies>
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <excludes>
+                    <exclude>**.yml</exclude>
+                    <exclude>**.yaml</exclude>
+                    <exclude>**/*.yml</exclude>
+                </excludes>
+            </resource>
+            <resource>
+                <directory>doc</directory>
+                <excludes>
+                    <exclude>**.*</exclude>
+                </excludes>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
