@@ -71,7 +71,7 @@ public class LogConfigurer
     }
 
     @Bean
-    public LogFacade facade(LogDao<OperationLog> opDao, LogDao<SecurityLog> secDao, LogDao<SystemLog> sysDao)
+    public LogFacade logFacade(LogDao<OperationLog> opDao, LogDao<SecurityLog> secDao, LogDao<SystemLog> sysDao)
     {
         //可以注入自定义的实现(比如把日志改到存储至数据库)
         return new LogFacade(opDao, secDao, sysDao);

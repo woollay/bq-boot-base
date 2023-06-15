@@ -2,6 +2,8 @@ package com.biuqu.boot.configure;
 
 import com.biuqu.boot.constants.BootConst;
 import com.biuqu.constants.Const;
+import com.biuqu.json.Json2HttpConverter;
+import com.biuqu.json.JsonIgnoreMgr;
 import com.biuqu.json.JsonMappers;
 import com.biuqu.model.GlobalDict;
 import com.biuqu.service.BaseBizService;
@@ -36,36 +38,6 @@ import java.util.Set;
 @Configuration
 public class WebMvcConfigurer extends BaseWebConfigurer
 {
-    /**
-     * actuator健康检查的自定义类型
-     */
-    private static final String ACTUATOR_TYPE = "vnd.spring-boot.actuator.v3+json";
-    /**
-     * 字典服务
-     */
-    @Resource(name = BootConst.GLOBAL_DICT_SVC)
-    private BaseBizService<GlobalDict> dictService;
-    /**
-     * 限流handler
-     */
-    @Resource(name = BootConst.CLIENT_LIMIT_SVC)
-    private HandlerInterceptor limitHandler;
-    /**
-     * 是否驼峰式json(默认支持)
-     */
-    @Value("${bq.json.snake-case:true}")
-    private boolean snakeCase;
-    /**
-     * 直接拦截的url
-     */
-    @Value("${bq.web.invalid-urls:''}")
-    private String invalidUrls;
-    /**
-     * 直接拦截的url
-     */
-    @Value("${bq.limit.enabled:false}")
-    private boolean limitEnabled;
-
     @Override
     protected void addInterceptors(InterceptorRegistry registry)
     {
@@ -110,8 +82,9 @@ public class WebMvcConfigurer extends BaseWebConfigurer
             HttpMessageConverter<?> converter = converters.get(i);
             if (converter instanceof MappingJackson2HttpMessageConverter)
             {
-                ObjectMapper mapper = JsonMappers.getMapper(this.snakeCase);
-                MappingJackson2HttpMessageConverter conv = new MappingJackson2HttpMessageConverter();
+                //支持接口返回数据驼峰转换、打码和属性忽略
+                ObjectMapper mapper = JsonMappers.getMaskMapper(snakeCase, true);
+                MappingJackson2HttpMessageConverter conv = new Json2HttpConverter(this.ignoreMgr);
                 conv.setObjectMapper(mapper);
 
                 //默认返回的Jackson对应的Rest服务的ContentType为:'application/json;charset=UTF-8'
@@ -141,4 +114,45 @@ public class WebMvcConfigurer extends BaseWebConfigurer
         }
         return urls;
     }
+
+    /**
+     * actuator健康检查的自定义类型
+     */
+    private static final String ACTUATOR_TYPE = "vnd.spring-boot.actuator.v3+json";
+
+    /**
+     * 字典服务
+     */
+    @Resource(name = BootConst.GLOBAL_DICT_SVC)
+    private BaseBizService<GlobalDict> dictService;
+
+    /**
+     * 限流handler
+     */
+    @Resource(name = BootConst.CLIENT_LIMIT_SVC)
+    private HandlerInterceptor limitHandler;
+
+    /**
+     * json忽略管理器
+     */
+    @Resource(name = Const.JSON_IGNORE_SVC)
+    private JsonIgnoreMgr ignoreMgr;
+
+    /**
+     * 是否驼峰式json(默认支持)
+     */
+    @Value("${bq.json.snake-case:true}")
+    private boolean snakeCase;
+
+    /**
+     * 直接拦截的url
+     */
+    @Value("${bq.web.invalid-urls:''}")
+    private String invalidUrls;
+
+    /**
+     * 直接拦截的url
+     */
+    @Value("${bq.limit.enabled:false}")
+    private boolean limitEnabled;
 }

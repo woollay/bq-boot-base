@@ -12,7 +12,7 @@
     </parent>
 
     <artifactId>bq-boot-base</artifactId>
-    <name>bq-boot-base</name>
+    <version>1.0.4</version>
     <description>easy use web container for springboot project</description>
     <url>https://github.com/woollay/bq-boot-base</url>
 
@@ -26,7 +26,7 @@
         <dependency>
             <groupId>com.biuqu</groupId>
             <artifactId>bq-boot-root</artifactId>
-            <version>${bq.version}</version>
+            <version>1.0.4</version>
         </dependency>
 
         <dependency>
