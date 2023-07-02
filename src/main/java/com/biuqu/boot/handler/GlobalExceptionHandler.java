@@ -1,14 +1,15 @@
 package com.biuqu.boot.handler;
 
+import com.alibaba.csp.sentinel.slots.block.BlockException;
 import com.biuqu.constants.Const;
+import com.biuqu.errcode.ErrCodeEnum;
 import com.biuqu.errcode.ErrCodeMgr;
 import com.biuqu.exception.CommonException;
 import com.biuqu.handler.BaseExceptionHandler;
 import com.biuqu.model.ErrCode;
 import com.biuqu.model.ResultCode;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.ObjectError;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.UndeclaredThrowableException;
 import java.util.List;
 
 /**
@@ -30,6 +32,7 @@ import java.util.List;
  * @author BiuQu
  * @date 2023/2/1 09:29
  */
+@Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler extends BaseExceptionHandler
 {
@@ -38,6 +41,17 @@ public class GlobalExceptionHandler extends BaseExceptionHandler
     @ResponseBody
     public ResultCode<?> handleErr(HttpServletRequest req, Exception e)
     {
+        Throwable ex = e;
+        if (e instanceof UndeclaredThrowableException)
+        {
+            UndeclaredThrowableException realEx = (UndeclaredThrowableException)e;
+            ex = realEx.getUndeclaredThrowable();
+        }
+        if (ex instanceof BlockException)
+        {
+            log.error("sentinel block happened.", ex);
+            return ResultCode.error(ErrCodeEnum.LIMIT_ERROR.getCode());
+        }
         return handle(req.getRequestURI(), e);
     }
 
@@ -70,12 +84,7 @@ public class GlobalExceptionHandler extends BaseExceptionHandler
     @Override
     protected ErrCode getByUrl(String url, String code)
     {
-        LOGGER.error("current[{}] request happened err:{}", url, code);
+        log.error("current[{}] request happened err:{}", url, code);
         return ErrCodeMgr.get(code);
     }
-
-    /**
-     * 日志句柄
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 }

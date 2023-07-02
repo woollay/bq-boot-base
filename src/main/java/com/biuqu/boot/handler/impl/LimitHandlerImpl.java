@@ -6,6 +6,8 @@ import com.biuqu.boot.service.LimitService;
 import com.biuqu.model.GlobalConfig;
 import com.biuqu.model.LimitConfig;
 import com.biuqu.service.BaseBizService;
+import com.biuqu.utils.JsonUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
  * @author BiuQu
  * @date 2023/2/1 21:02
  */
+@Slf4j
 @Service
 public class LimitHandlerImpl implements LimitHandler
 {
@@ -31,6 +34,7 @@ public class LimitHandlerImpl implements LimitHandler
             boolean maxResult = limitService.maxLimit(maxConfig);
             if (maxResult)
             {
+                log.error("[{}]reach max limit:{}.", JsonUtil.toJson(model), JsonUtil.toJson(maxConfig));
                 return true;
             }
         }
@@ -41,6 +45,7 @@ public class LimitHandlerImpl implements LimitHandler
             boolean qpsResult = limitService.qpsLimit(qpsConfig);
             if (qpsResult)
             {
+                log.error("[{}]reach qps limit:{}.", JsonUtil.toJson(model), JsonUtil.toJson(maxConfig));
                 return true;
             }
         }

@@ -23,7 +23,6 @@ import java.util.List;
  */
 @Slf4j
 public class BaseBizController<O, T extends BaseBiz<O>, I extends BaseBizInner<T>>
-    extends BaseServletFallbackController<I, O>
 {
     /**
      * 获取批量结果(适用于接口调用)
